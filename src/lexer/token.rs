@@ -15,6 +15,9 @@ lazy_static! {
         m.insert("else".to_string(), TokenType::Else);
         m.insert("true".to_string(), TokenType::True);
         m.insert("false".to_string(), TokenType::False);
+        m.insert("int".to_string(), TokenType::Int);
+        m.insert("void".to_string(), TokenType::Void);
+        m.insert("return".to_string(), TokenType::Return);
 
         m
     };
@@ -25,10 +28,15 @@ pub enum TokenType {
     // Single-character
     LeftParenthesis,
     RightParenthesis,
+    LeftBrace,
+    RightBrace,
+    Semicolon,
 
     // One or two character tokens
     Bang,
     BangEqual,
+    Equal,
+    EqualEqual,
 
     // Literals
     Identifier,
@@ -42,14 +50,17 @@ pub enum TokenType {
     Else,
     True,
     False,
+    Int,
+    Void,
+    Return,
 
     EOF,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Token {
     pub token_type: TokenType,
-    lexeme: String,
+    pub lexeme: String,
     pub line: usize,
 }
 

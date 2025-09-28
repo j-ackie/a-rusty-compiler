@@ -39,11 +39,24 @@ fn main() {
                     }
                 }
             }
-            std::process::exit(1); // Exit the program with an error code
+            std::process::exit(1);
         }
     };
 
     lexer::pretty_print_tokens(&tokens);
 
-    parser::parse(tokens);
+    let program = match parser::parse(tokens) {
+        Ok(program) => program,
+        Err(error) => {
+            eprintln!("Errors occurred during parsing: ");
+            match error {
+                parser::ParseError::UnexpectedToken(line) => {
+                    eprintln!("\x1b[31mUnexpected token at line {}\x1b[0m", line)
+                }
+            }
+            std::process::exit(1);
+        }
+    };
+
+    println!("Parsed program: {:#?}", program);
 }

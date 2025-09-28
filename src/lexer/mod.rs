@@ -51,6 +51,8 @@ fn scan_token(source_chars: &mut Peekable<Chars>, line: &mut usize) -> Result<To
         // Single-character tokens
         '(' => TokenType::LeftParenthesis,
         ')' => TokenType::RightParenthesis,
+        '{' => TokenType::LeftBrace,
+        '}' => TokenType::RightBrace,
         '!' => {
             if match_two_char_token('=', source_chars) {
                 final_text.push('=');
@@ -59,6 +61,15 @@ fn scan_token(source_chars: &mut Peekable<Chars>, line: &mut usize) -> Result<To
                 TokenType::Bang
             }
         }
+        '=' => {
+            if match_two_char_token('=', source_chars) {
+                final_text.push('=');
+                TokenType::EqualEqual
+            } else {
+                TokenType::Equal
+            }
+        }
+        ';' => TokenType::Semicolon,
 
         // Literals
         '"' => {
