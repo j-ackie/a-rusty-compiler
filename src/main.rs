@@ -1,4 +1,5 @@
-mod lexer;
+pub mod lexer;
+pub mod parser;
 
 use std::env;
 use std::fs;
@@ -43,4 +44,6 @@ fn main() {
     };
 
     lexer::pretty_print_tokens(&tokens);
+
+    parser::parse(tokens);
 }

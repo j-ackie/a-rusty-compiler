@@ -1,6 +1,6 @@
 use std::{iter::Peekable, str::Chars};
 
-mod token;
+pub mod token;
 
 use {token::KEYWORDS, token::Token, token::TokenType};
 
