@@ -1,5 +1,7 @@
+pub mod ast;
 pub mod lexer;
 pub mod parser;
+pub mod semantic_checker;
 
 use std::env;
 use std::fs;
@@ -10,17 +12,27 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let mut test = false;
+    let mut file = String::new();
 
-    for arg in args.iter() {
+    let mut iter = args.iter().skip(1);
+    while let Some(arg) = iter.next() {
         match arg.as_str() {
             "test" => {
                 test = true;
+            }
+            "-c" => {
+                if let Some(f) = iter.next() {
+                    file = f.to_string();
+                } else {
+                    eprintln!("Expected file name after -c");
+                    std::process::exit(1);
+                }
             }
             _ => {}
         }
     }
 
-    let contents = fs::read_to_string("src/program.c").expect("Failed to read file");
+    let contents = fs::read_to_string(file).expect("Failed to read file");
 
     let tokens = match lexer::tokenize(contents, test) {
         Ok(tokens) => tokens,
@@ -59,4 +71,26 @@ fn main() {
     };
 
     println!("Parsed program: {:#?}", program);
+
+    match semantic_checker::check(&program) {
+        Ok(()) => println!("\x1b[32mSemantic check passed!\x1b[0m"),
+        Err(error) => {
+            eprintln!("Errors occurred during semantic checking: ");
+            match error {
+                semantic_checker::SemanticError::UndefinedVariable(name) => {
+                    eprintln!("\x1b[31mUndefined variable: '{}'\x1b[0m", name)
+                }
+                semantic_checker::SemanticError::ReservedKeyword(name) => {
+                    eprintln!(
+                        "\x1b[31mReserved keyword used as identifier: '{}'\x1b[0m",
+                        name
+                    )
+                }
+                semantic_checker::SemanticError::TypeError(message) => {
+                    eprintln!("\x1b[31mType error: {}\x1b[0m", message)
+                }
+            }
+            std::process::exit(1);
+        }
+    };
 }

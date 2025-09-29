@@ -1,5 +1,5 @@
 int main(void) {
-    int a = 4;
+    bool a = 4;
 
     return 1234;
 }

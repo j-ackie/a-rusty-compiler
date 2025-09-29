@@ -1,92 +1,7 @@
 use std::iter::Peekable;
 
+use crate::ast::*;
 use crate::lexer::token::{Token, TokenType};
-
-#[derive(Debug)]
-pub enum DataType {
-    Int,
-    Char,
-    Float,
-    Double,
-    Bool,
-    Void,
-}
-
-#[derive(Debug)]
-pub struct Literal {
-    pub value: String,
-}
-
-#[derive(Debug)]
-pub struct Identifier {
-    pub name: String,
-}
-
-#[derive(Debug)]
-pub enum Expr {
-    Literal(Literal),
-    Identifier(Identifier),
-}
-
-#[derive(Debug)]
-pub struct Assignment {
-    pub data_type: DataType,
-    pub identifier: Identifier,
-    pub value: Expr,
-}
-
-#[derive(Debug)]
-pub struct Return {
-    pub value: Expr,
-}
-
-#[derive(Debug)]
-pub enum Instruction {
-    Assignment(Assignment),
-    Return(Return),
-}
-
-#[derive(Debug)]
-pub struct Function {
-    pub return_type: DataType,
-    pub name: String,
-    pub instructions: Vec<Instruction>,
-}
-
-#[derive(Debug)]
-pub struct Program {
-    pub functions: Vec<Function>,
-}
-
-trait Visitor<T> {
-    fn visit_literal(&mut self, literal: &Literal) -> T;
-    fn visit_identifier(&mut self, identifier: &Identifier) -> T;
-    fn visit_expr(&mut self, expr: &Expr) -> T;
-}
-
-pub struct AstPrinter;
-impl AstPrinter {
-    pub fn print(&mut self, expr: &Expr) {
-        println!("{}", self.visit_expr(expr));
-    }
-}
-
-impl Visitor<String> for AstPrinter {
-    fn visit_literal(&mut self, literal: &Literal) -> String {
-        return literal.value.clone();
-    }
-
-    fn visit_identifier(&mut self, identifier: &Identifier) -> String {
-        return identifier.name.clone();
-    }
-
-    fn visit_expr(&mut self, expr: &Expr) -> String {
-        match expr {
-            Expr::Literal(literal) => self.visit_literal(literal),
-            Expr::Identifier(identifier) => self.visit_identifier(identifier),
-        }
-    }
-}
 
 pub enum ParseError {
     UnexpectedToken(usize),
@@ -124,8 +39,6 @@ fn match_token(
         None => return None,
     };
 
-    println!("HELLO: {:?}, {:?}", token.token_type, expected_token_type);
-
     if token.token_type != expected_token_type {
         return None;
     }
@@ -134,18 +47,23 @@ fn match_token(
 }
 
 fn parse_literal(tokens: &mut Peekable<impl Iterator<Item = Token>>) -> Option<Literal> {
-    match tokens.peek() {
+    let literal: Literal = match tokens.peek() {
         Some(token) => match token.token_type {
-            TokenType::Number | TokenType::String | TokenType::True | TokenType::False => {
-                let token = tokens.next().unwrap();
-                return Some(Literal {
-                    value: token.lexeme,
-                });
-            }
+            TokenType::Number => Literal::Integer(IntegerLiteral {
+                value: token.lexeme.parse().ok()?,
+            }),
+            TokenType::True => Literal::Boolean(BooleanLiteral { value: true }),
+            TokenType::False => Literal::Boolean(BooleanLiteral { value: false }),
+            TokenType::String => Literal::String(StringLiteral {
+                value: token.lexeme.clone(),
+            }),
             _ => return None,
         },
-        None => None,
-    }
+        None => return None,
+    };
+
+    tokens.next();
+    Some(literal)
 }
 
 fn parse_identifier(tokens: &mut Peekable<impl Iterator<Item = Token>>) -> Option<Identifier> {
@@ -177,6 +95,10 @@ fn parse_type(tokens: &mut Peekable<impl Iterator<Item = Token>>) -> Option<Data
     let data_type = match tokens.peek() {
         Some(token) => match token.token_type {
             TokenType::Int => DataType::Int,
+            TokenType::Bool => DataType::Bool,
+            TokenType::Char => DataType::Char,
+            TokenType::Float => DataType::Float,
+            TokenType::Double => DataType::Double,
             TokenType::Void => DataType::Void,
             _ => return None,
         },

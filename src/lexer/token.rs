@@ -16,6 +16,10 @@ lazy_static! {
         m.insert("true".to_string(), TokenType::True);
         m.insert("false".to_string(), TokenType::False);
         m.insert("int".to_string(), TokenType::Int);
+        m.insert("bool".to_string(), TokenType::Bool);
+        m.insert("char".to_string(), TokenType::Char);
+        m.insert("float".to_string(), TokenType::Float);
+        m.insert("double".to_string(), TokenType::Double);
         m.insert("void".to_string(), TokenType::Void);
         m.insert("return".to_string(), TokenType::Return);
 
@@ -51,6 +55,10 @@ pub enum TokenType {
     True,
     False,
     Int,
+    Bool,
+    Char,
+    Float,
+    Double,
     Void,
     Return,
 

@@ -23,6 +23,8 @@ Compiling C code to Assembly with a Rust-written compiler
 
 ## Organization
 
+SOOO extra but thought it was cool.
+
 ```mermaid
 graph TD;
   A-->B;
