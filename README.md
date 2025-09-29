@@ -28,6 +28,6 @@ SOOO extra but thought it was cool.
 ```mermaid
 graph TD;
   Lexer-->Parser;
-  Parser-->"Semantic Analyzer";
-  "Semantic Analyzer"-->"IR Generator";
+  Parser-->SemanticAnalyzer["Semantic Analyzer"];
+  SemanticAnalyzer-->IRGenerator["IR Generator"];
 ```
