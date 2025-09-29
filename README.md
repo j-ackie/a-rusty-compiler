@@ -27,5 +27,7 @@ SOOO extra but thought it was cool.
 
 ```mermaid
 graph TD;
-  A-->B;
+  Lexer-->Parser;
+  Parser-->Semantic Analyzer;
+  Semantic Analyzer-->IR Generator;
 ```
